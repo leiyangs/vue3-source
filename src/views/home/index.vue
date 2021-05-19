@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import data from '@/static/data.json';
+// import data from '@/static/data.json';
 import homeHeader from './header.vue';
 import list from './list.vue';
 import swiper from './swiper.vue';
@@ -23,7 +23,7 @@ export default defineComponent({
     swiper
   },
   setup() {
-    console.log(data)
+    // console.log(data)
   },
 })
 </script>
