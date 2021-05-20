@@ -2,14 +2,16 @@
   <div>
     <homeHeader/>
     <swiper/>
+    我是默认类型{{cuurrentCategory}}
     <list/>
     <van-button type="primary" url="/vant/mobile.html">URL 跳转</van-button>
   </div>
 </template>
 
-
 <script lang="ts">
-import { defineComponent } from 'vue'
+import IGlobalState from '@/typings';
+import { useStore } from 'vuex';
+import { computed, defineComponent } from 'vue'
 // import data from '@/static/data.json';
 import homeHeader from './header.vue';
 import list from './list.vue';
@@ -22,8 +24,15 @@ export default defineComponent({
     list,
     swiper
   },
+  // Composition Api 入口
   setup() {
-    // console.log(data)
+    let store = useStore<IGlobalState>();
+    console.log(store.state.home.currentCategory)
+    let cuurrentCategory = computed(() => store.state.home.currentCategory);
+
+    return {
+      cuurrentCategory
+    }
   },
 })
 </script>
