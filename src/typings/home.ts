@@ -1,5 +1,6 @@
 // home的类型
 export enum CATEGORY_TYPES { // 外卖类型
+  All,
   BREAKFAST,
   LUNCH,
   AFTERNOON,

@@ -19,7 +19,9 @@ const home:Module<IHomeState, IGlobalState> = {
   namespaced: true,
   state,
   mutations: {
-    
+    SET_CATEGORY(state:IHomeState, payload:CATEGORY_TYPES) {
+      state.currentCategory = payload;
+    }
   },
   actions: {
     
