@@ -1,14 +1,17 @@
 <template>
-  <div>
+  <div class="header">
+    <div>
+      吃了么
+    </div>
     <van-dropdown-menu active-color="#1989fa">
-      <van-dropdown-item v-model="category" :options="categoryList" />
+      <van-dropdown-item :modelValue="category" :options="categoryList" />
     </van-dropdown-menu>
   </div>
 </template>
 
 <script lang="ts">
 import { CATEGORY_TYPES } from '@/typings/home'
-import { defineComponent, PropType, reactive, toRef, toRefs } from 'vue'
+import { defineComponent, PropType, reactive, toRefs } from 'vue'
 
 export default defineComponent({
   props: {
@@ -29,7 +32,7 @@ export default defineComponent({
         { text: '晚餐', value: CATEGORY_TYPES.DINNER },
       ]
     })
-
+    console.log(state)
     return {
       ...toRefs(state)
     }
@@ -37,3 +40,20 @@ export default defineComponent({
 })
 </script>
 
+<style lang="scss" scoped>
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  background: #409EFF;
+  color: #fff;
+  padding: 0 10px;
+  width: calc(100% - 20px); 
+  height: 55px;
+  line-height: 55px;
+}
+</style>
