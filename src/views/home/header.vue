@@ -4,7 +4,8 @@
       吃了么
     </div>
     <van-dropdown-menu active-color="#1989fa">
-      <van-dropdown-item :modelValue="category" :options="categoryList" />
+      <!-- v-model在vue3中会变为:modelValue -->
+      <van-dropdown-item :modelValue="category" :options="categoryList" @change="change" />
     </van-dropdown-menu>
   </div>
 </template>
@@ -20,9 +21,9 @@ export default defineComponent({
     }
   },
   emits: ['setCurrentCategory'],
+  // props 是父组件传递的参数；context 中有attr slots emit
   setup(props, context) {
-    console.log(props.category);
-    context.emit('setCurrentCategory')
+    // reactive 响应式方法，可以创建响应式数据
     let state = reactive({
       categoryList: [
         { text: '全部类型', value: CATEGORY_TYPES.All },
@@ -30,11 +31,18 @@ export default defineComponent({
         { text: '午餐', value: CATEGORY_TYPES.LUNCH },
         { text: '下午茶', value: CATEGORY_TYPES.AFTERNOON },
         { text: '晚餐', value: CATEGORY_TYPES.DINNER },
-      ]
+      ],
+      value:1
     })
-    console.log(state)
+    console.log(toRefs(state))
+    function change(value: CATEGORY_TYPES) {
+      context.emit('setCurrentCategory', value); // 调用父组件方法
+    }
+    
     return {
-      ...toRefs(state)
+      // toRefs 解构state，并且返回响应式数据
+      ...toRefs(state),
+      change,
     }
   },
 })

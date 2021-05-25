@@ -3,7 +3,7 @@ import { CATEGORY_TYPES, IHomeState } from "@/typings/home";
 import { Module } from "vuex";
 
 const state: IHomeState = {
-  currentCategory: CATEGORY_TYPES.BREAKFAST,
+  currentCategory: CATEGORY_TYPES.All,
   sliders: [],
   goods: {
     hasMore: true, // 是否又更多数据

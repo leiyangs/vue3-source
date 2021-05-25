@@ -21,11 +21,14 @@ import { CATEGORY_TYPES } from '@/typings/home';
 // vue2中需要把computed和methods写到不同地方，而Composition Api可以把他们都封装到一个函数中
 function useCategory(store:Store<IGlobalState>) {
   let category = computed(() => store.state.home.currentCategory); // 如果不用计算属性，category是一个固定的值，store改变不会变化
+
   function setCurrentCategory(category: CATEGORY_TYPES) {
     store.commit('home/SET_CATEGORY', category);
   }
+
   return {category,setCurrentCategory}
 }
+
 // defineCompoent包裹可以有提示(此提示是ts提示，不是vuter提示)
 export default defineComponent({
   components: {
