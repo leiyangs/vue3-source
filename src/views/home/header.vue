@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div>
-      吃了么
+      吃了么 {{value}}
     </div>
     <van-dropdown-menu active-color="#1989fa">
       <!-- v-model在vue3中会变为:modelValue -->
@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { CATEGORY_TYPES } from '@/typings/home'
-import { defineComponent, PropType, reactive, toRefs } from 'vue'
+import { defineComponent, PropType, reactive, ref, toRefs } from 'vue'
 
 export default defineComponent({
   props: {
@@ -32,15 +32,20 @@ export default defineComponent({
         { text: '下午茶', value: CATEGORY_TYPES.AFTERNOON },
         { text: '晚餐', value: CATEGORY_TYPES.DINNER },
       ],
-      value:1
+      value: ref(0)
     })
-    console.log(toRefs(state))
+    
+    setTimeout(() => {
+      state.value = 2;
+    }, 1000);
+
     function change(value: CATEGORY_TYPES) {
       context.emit('setCurrentCategory', value); // 调用父组件方法
     }
     
     return {
       // toRefs 解构state，并且返回响应式数据
+      // ref可以包装单个数据,并返回响应式的数据
       ...toRefs(state),
       change,
     }
