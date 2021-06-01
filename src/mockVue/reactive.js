@@ -1,9 +1,8 @@
-import { triggerRef } from "@vue/reactivity";
-
 let activeEffect;
 export function effect(fn) { // 渲染函数
   activeEffect = fn;
   fn();
+  activeEffecta = null; // 页面渲染完清空
 }
 
 export function reactive(target) {
@@ -39,10 +38,6 @@ export function reactive(target) {
 } */
 
 const targetMap = new WeakMap();
-function trigger(target,key) {
-
-}
-
 function track(target,key) {
   let map = targetMap.get(target);
   if(!map) {
@@ -55,6 +50,13 @@ function track(target,key) {
   if(activeEffect && !deps.has(activeEffect)) {
     deps.add(activeEffect);
   }
+}
+
+function trigger(target,key) {
+  const map = targetMap.get(target);
+  if(!map) return;
+  const effects = map.get(key);
+  effects && effects.forEach(effect => effect());
 }
 
 
