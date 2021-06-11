@@ -8,25 +8,25 @@ export enum CATEGORY_TYPES { // 外卖类型
 }
 
 export interface ISlider {
-image: string
+  image: string;
 }
 
 export interface IGoods {
-  hasMore: boolean,
-  loading: boolean,
-  offset: number,
-  limit: number,
-  list: IGoodsList[]
+  hasMore: boolean;
+  loading: boolean;
+  offset: number;
+  limit: number;
+  list: IGoodsList[];
 }
 
 export interface IGoodsList {
-  name: string,
-  image: string,
-  category?: string 
+  name: string;
+  image: string;
+  category?: string;
 }
 
 export interface IHomeState {
-  currentCategory: CATEGORY_TYPES,
-  sliders: ISlider[],
-  goods: IGoods
+  currentCategory: CATEGORY_TYPES;
+  sliders: ISlider[];
+  goods: IGoods;
 }

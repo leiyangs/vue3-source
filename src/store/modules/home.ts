@@ -1,5 +1,5 @@
 import IGlobalState from "@/typings";
-import { CATEGORY_TYPES, IHomeState } from "@/typings/home";
+import { CATEGORY_TYPES, IHomeState, ISlider } from "@/typings/home";
 import { Module } from "vuex";
 
 const state: IHomeState = {
@@ -11,21 +11,22 @@ const state: IHomeState = {
     offset: 0,
     limit: 5,
     list: [], // 当前数据
-  }
-}
+  },
+};
 
 // vuex提供的泛型Module，需要传入S(自己的状态) R(根状态)
-const home:Module<IHomeState, IGlobalState> = {
+const home: Module<IHomeState, IGlobalState> = {
   namespaced: true,
   state,
   mutations: {
-    SET_CATEGORY(state:IHomeState, payload:CATEGORY_TYPES) {
+    SET_CATEGORY(state: IHomeState, payload: CATEGORY_TYPES) {
       state.currentCategory = payload;
+    },
+    SET_SLIDER_LIST(state: IHomeState, payload: ISlider[]) {
+      state.sliders = payload;
     }
   },
-  actions: {
-    
-  }
-}
+  actions: {},
+};
 
 export default home;
