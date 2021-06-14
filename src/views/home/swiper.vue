@@ -12,7 +12,6 @@
 import { computed, defineComponent } from "vue";
 import { useStore } from "vuex";
 import IGlobalState from "@/typings";
-const data = require('@/static/data.json');
 
 export default defineComponent({
   // 如果要给setup加async，父组件要用Suspense组件包裹(Suspense组件vue3自带)
@@ -21,12 +20,7 @@ export default defineComponent({
     let sliderList = computed(() => store.state.home.sliders);
     // 计算属性如果获取的是数组，要取他的value
     if(sliderList.value.length === 0) {
-      await new Promise((resolve, reject) => {
-        setTimeout(() => {
-          store.commit('home/SET_SLIDER_LIST', data.seller.sliders); // 假装是dispatch掉接口
-          resolve(true);
-        }, 600);
-      })
+      await store.dispatch('home/SET_SLIDER_LIST')
     }
 
     return {

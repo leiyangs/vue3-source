@@ -7,7 +7,13 @@
       <van-tabbar-item to="/profile" icon="user-circle-o">我的</van-tabbar-item>
     </van-tabbar>
   </div>
-  <router-view/>
+  <!-- <router-view/> -->
+  <!-- keep-alive用法 -->
+  <router-view v-slot="{Component}">
+    <keep-alive>
+      <component :is="Component"></component>
+    </keep-alive>
+  </router-view>
 </template>
 
 <style lang="scss">
