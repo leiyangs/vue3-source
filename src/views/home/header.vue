@@ -30,11 +30,11 @@ export default defineComponent({
     // reactive 响应式方法，可以创建响应式数据
     let state = reactive({
       categoryList: [
-        { text: "全部类型", value: CATEGORY_TYPES.All },
-        { text: "早餐", value: CATEGORY_TYPES.BREAKFAST },
-        { text: "午餐", value: CATEGORY_TYPES.LUNCH },
-        { text: "下午茶", value: CATEGORY_TYPES.AFTERNOON },
-        { text: "晚餐", value: CATEGORY_TYPES.DINNER },
+        { text: "热销榜", value: CATEGORY_TYPES.All },
+        { text: "单人精彩套餐", value: CATEGORY_TYPES.BREAKFAST },
+        { text: "冰爽饮品限时特惠", value: CATEGORY_TYPES.LUNCH },
+        { text: "精选热菜", value: CATEGORY_TYPES.AFTERNOON },
+        { text: "爽口凉菜", value: CATEGORY_TYPES.DINNER },
       ],
     });
 

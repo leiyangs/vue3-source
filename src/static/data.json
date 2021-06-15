@@ -50,7 +50,7 @@
   },
   "goods": {
     "hasMore": true,
-    "loading": true,
+    "loading": false,
     "offset": 3,
     "limit": 1,
     "list": [

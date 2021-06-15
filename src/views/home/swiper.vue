@@ -16,10 +16,10 @@ import IGlobalState from "@/typings";
 export default defineComponent({
   // 如果要给setup加async，父组件要用Suspense组件包裹(Suspense组件vue3自带)
   async setup() {
-    let store = useStore<IGlobalState>();
-    let sliderList = computed(() => store.state.home.sliders);
+    const store = useStore<IGlobalState>();
+    const sliderList = computed(() => store.state.home.sliders);
     // 计算属性如果获取的是数组，要取他的value
-    if(sliderList.value.length === 0) {
+    if(sliderList.value.length === 0) { // 做缓存 如果有keep-alive，可以不写
       await store.dispatch('home/SET_SLIDER_LIST')
     }
 
