@@ -23,7 +23,7 @@ export default defineComponent({
     let store = useStore<IGlobalState>();
     let currentCategory = computed(() => store.state.home.currentCategory);
     onMounted(() => {
-      let arr = toRaw(props.goodsList);
+      let arr = JSON.parse(JSON.stringify(props.goodsList));
       console.log(arr)
     })
     return {currentCategory}

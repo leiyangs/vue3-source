@@ -4,7 +4,7 @@
       :category="category"
       @setCurrentCategory="setCurrentCategory"
     />
-    <div class="container">
+    <div class="container" ref="refreshDom">
       <Suspense>
         <!-- default 加载完成显示的内容 -->
         <template #default>
@@ -25,12 +25,13 @@
 <script lang="ts">
 import IGlobalState from "@/typings";
 import { Store, useStore } from "vuex";
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 // import data from '@/static/data.json';
 import HomeHeader from "./header.vue";
 import List from "./list.vue";
 import Swiper from "./swiper.vue";
 import { CATEGORY_TYPES } from "@/typings/home";
+import loadMore from '@/hooks/loadMore';
 
 // vue2中需要把computed和methods写到不同地方，而Composition Api可以把他们都封装到一个函数中
 function useCategory(store: Store<IGlobalState>) {
@@ -67,8 +68,11 @@ export default defineComponent({
     let store = useStore<IGlobalState>();
     let { category, setCurrentCategory } = useCategory(store);
     let { goodsList } = useGoodsList(store);
+    // ref获取dom
+    const refreshDom = ref<null | HTMLElement>(null); // ref用法和react差不多
+    const { isLoading, hasMore } = loadMore(refreshDom, store, 'home/SET_GOODS_LIST');
 
-    return { category, setCurrentCategory, goodsList };
+    return { category, setCurrentCategory, goodsList, refreshDom };
   },
 });
 </script>
@@ -77,5 +81,6 @@ export default defineComponent({
 .container {
   height: calc(100vh - 105px);
   margin-top: 55px;
+  overflow-y: scroll;
 }
 </style>

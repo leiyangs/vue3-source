@@ -62,10 +62,10 @@ const home: Module<IHomeState, IGlobalState> = {
             list : []
           };
           // 假装分页获取数据
-          goods.list = data.goods.list.slice(offset, offset + 3);
+          goods.list = data.goods.list.slice(offset, offset + 4);
           goods.hasMore = true;
           if(offset >= GOODSLEN) {
-            goods.list = data.goods.list.slice(offset, offset + 3);
+            goods.list = data.goods.list.slice(offset, offset + 4);
             goods.hasMore = false;
           }
           commit('SET_GOODS_LIST', goods);
