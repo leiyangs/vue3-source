@@ -1,9 +1,6 @@
 <template>
   <div class="header">
-    <HomeHeader
-      :category="category"
-      @setCurrentCategory="setCurrentCategory"
-    />
+    <HomeHeader :category="category" @setCurrentCategory="setCurrentCategory" />
     <div class="container" ref="refreshDom">
       <Suspense>
         <!-- default 加载完成显示的内容 -->
@@ -17,8 +14,9 @@
       </Suspense>
 
       <List :goodsList="goodsList" />
+      <div v-if="isLoading">加载中...</div>
+      <div v-if="!hasMore">没有更多了</div>
     </div>
-    
   </div>
 </template>
 
@@ -31,7 +29,7 @@ import HomeHeader from "./header.vue";
 import List from "./list.vue";
 import Swiper from "./swiper.vue";
 import { CATEGORY_TYPES } from "@/typings/home";
-import loadMore from '@/hooks/loadMore';
+import loadMore from "@/hooks/loadMore";
 
 // vue2中需要把computed和methods写到不同地方，而Composition Api可以把他们都封装到一个函数中
 function useCategory(store: Store<IGlobalState>) {
@@ -46,14 +44,15 @@ function useCategory(store: Store<IGlobalState>) {
 
 function useGoodsList(store: Store<IGlobalState>) {
   const goodsList = computed(() => store.state.home.goods.list);
-  onMounted(() => { // 初始化加载
+  onMounted(() => {
+    // 初始化加载
     // 计算属性如果获取的是数组，要取他的value
-    if(goodsList.value.length === 0){
-      store.dispatch('home/SET_GOODS_LIST');
+    if (goodsList.value.length === 0) {
+      store.dispatch("home/SET_GOODS_LIST");
     }
-  })
+  });
 
-  return { goodsList }
+  return { goodsList };
 }
 
 // defineCompoent包裹可以有提示(此提示是ts提示，不是vuter提示)
@@ -70,9 +69,20 @@ export default defineComponent({
     let { goodsList } = useGoodsList(store);
     // ref获取dom
     const refreshDom = ref<null | HTMLElement>(null); // ref用法和react差不多
-    const { isLoading, hasMore } = loadMore(refreshDom, store, 'home/SET_GOODS_LIST');
+    let { isLoading, hasMore } = loadMore(
+      refreshDom,
+      store,
+      "home/SET_GOODS_LIST"
+    );
 
-    return { category, setCurrentCategory, goodsList, refreshDom };
+    return {
+      category,
+      setCurrentCategory,
+      goodsList,
+      refreshDom,
+      isLoading,
+      hasMore,
+    };
   },
 });
 </script>

@@ -34,6 +34,9 @@ const home: Module<IHomeState, IGlobalState> = {
     SET_LOADING(state: IHomeState, payload: boolean) {
       state.goods.loading = payload;
     },
+    SET_HASMORE(state: IHomeState, payload: boolean) {
+      state.goods.hasMore = payload;
+    },
   },
   actions: {
     async SET_SLIDER_LIST({commit}) {
@@ -62,11 +65,10 @@ const home: Module<IHomeState, IGlobalState> = {
             list : []
           };
           // 假装分页获取数据
-          goods.list = data.goods.list.slice(offset, offset + 4);
+          goods.list = data.goods.list.slice(offset, offset += 4);
           goods.hasMore = true;
           if(offset >= GOODSLEN) {
-            goods.list = data.goods.list.slice(offset, offset + 4);
-            goods.hasMore = false;
+            commit('SET_HASMORE', false);
           }
           commit('SET_GOODS_LIST', goods);
           resolve(true);
