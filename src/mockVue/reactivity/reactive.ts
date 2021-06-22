@@ -1,4 +1,5 @@
 import { isObject } from "../utils";
+import { mutableHandlers } from "./baseHandlers";
 
 export function reactive(target: object) {
   // 将target转换为响应式对象 Proxy
