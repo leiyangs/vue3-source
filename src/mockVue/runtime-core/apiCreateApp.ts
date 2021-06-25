@@ -12,6 +12,7 @@ export function createAppAPI(render: any) {
     const app = {
       mount(container: any) {
         const vNode = createVNode(rootComponent);
+        container = document.querySelector(container);
         render(vNode, container); // createRenderer中的render函数
       },
     };

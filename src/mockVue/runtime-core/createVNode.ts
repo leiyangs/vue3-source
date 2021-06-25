@@ -25,8 +25,9 @@ export function createVNode(
     el: null,
     shapeFlag, // vue3中 虚拟节点类型
   };
+  // 判断children类型 这样的话虚拟节点中既包括节点类型,有包括子的类型
   if (isArray(children)) {
-    // 如果两数或等中，有一个是1就是1  把两个数相加
+    // |=或等 如果两数或等中，有一个是1就是1  把两个数相加
     // 1 |= 16 = 17
     // 00000001 |= 00100000 => 00100001 = 17
     vnode.shapeFlag |= shapeFlags.ARRAY_CHILDREN;
@@ -34,5 +35,6 @@ export function createVNode(
     // 1 |= 8 = 9
     vnode.shapeFlag |= shapeFlags.TEXT_CHILDREN;
   }
+
   return vnode;
 }
