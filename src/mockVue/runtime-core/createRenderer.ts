@@ -17,17 +17,17 @@ function baseCreateRenderer(options: object) {
     patch(null, vNode, container);
   };
 
-  const mountElement = () => {};
-  const patchElement = () => {};
-  const mountComponent = () => {};
-  const updateComponent = () => {};
+  const mountElement = (n1: any, container: any) => {};
+  const patchElement = (n1: any, n2: any, container: any) => {};
+  const mountComponent = (n1: any, container: any) => {};
+  const updateComponent = (n1: any, n2: any, container: any) => {};
 
   // 处理元素
   const processElement = (n1: any, n2: any, container: any) => {
     if (n1 === null) {
-      mountElement();
+      mountElement(n1, container);
     } else {
-      patchElement();
+      patchElement(n1, n2, container);
     }
   };
 
@@ -35,10 +35,10 @@ function baseCreateRenderer(options: object) {
   const processComponent = (n1: any, n2: any, container: any) => {
     if (n1 === null) {
       //挂载
-      mountComponent();
+      mountComponent(n1, container);
     } else {
       //更新
-      updateComponent();
+      updateComponent(n1, n2, container);
     }
   };
 
