@@ -1,4 +1,4 @@
-import { isObject } from "../utils";
+import { isObject } from "../shared";
 import { mutableHandlers } from "./baseHandlers";
 
 export function reactive(target: object) {

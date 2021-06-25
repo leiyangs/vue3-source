@@ -1,5 +1,5 @@
-import { isObject } from "vant/lib/utils";
-import { hasChanged, isInteger, isSymbol } from "../utils";
+import { isObject } from "../shared";
+import { hasChanged, isInteger, isSymbol } from "../shared";
 import { track, trigger } from "./effect";
 import { reactive } from "./reactive";
 
