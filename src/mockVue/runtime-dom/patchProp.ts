@@ -29,7 +29,7 @@ function patchStyle(el: any, prev: any, next: any) {
         style[key] = next[key];
       }
     }
-    // 如果之前有style，排除上次有，这次没有的样式
+    // 如果之前有style，删除上次有，这次没有的样式
     if (prev) {
       for (const key in prev) {
         if (Object.prototype.hasOwnProperty.call(prev, key)) {

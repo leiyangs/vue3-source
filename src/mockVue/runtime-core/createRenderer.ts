@@ -25,7 +25,6 @@ function baseCreateRenderer(options: any) {
    * @param initialVnode
    * @param container
    */
-
   function setupRenderEffect(instance: any, initialVnode: any, container: any) {
     effect(function() {
       // 判断组件是第一次加载，还是已经加载过更新组件
@@ -38,6 +37,7 @@ function baseCreateRenderer(options: any) {
         // 更新 diff操作，两棵树的比对
         let prev = instance.subTree;
         let next = instance.render();
+        patch(prev, next, container);
       }
     });
   }
@@ -83,7 +83,77 @@ function baseCreateRenderer(options: any) {
     }
     hostInsert(el, container);
   };
-  const patchElement = (n1: any, n2: any, container: any) => {};
+
+  /**
+   * 对比新老属性
+   * @param oldProps
+   * @param newProps
+   * @param el
+   */
+  function patchProps(oldProps: any, newProps: any, el: any) {
+    if (oldProps !== newProps) {
+      // 有的新属性，覆盖老属性
+      for (const key in newProps) {
+        const prev = oldProps[key];
+        const next = newProps[key];
+        if (prev !== next) {
+          hostPatchProp(el, key, prev, next);
+        }
+      }
+      // 有的老属性但新的没有，删除老属性
+      for (const key in oldProps) {
+        if (!Object.prototype.hasOwnProperty.call(newProps, key)) {
+          const prev = oldProps[key];
+          hostPatchProp(el, key, prev, null);
+        }
+      }
+    }
+  }
+  /**
+   * 比较子(一个：字符串，多个：数组) 核心diff算法
+   * @param n1
+   * @param n2
+   * @param el
+   */
+  function patchChildren(n1: any, n2: any, el: any) {
+    const c1 = n1.children;
+    const c2 = n2.children;
+    const prevShapeFlag = n1.shapeFlag;
+    const nextShapeFlag = n2.shapeFlag;
+    // 老的是文本，新的是文本 => 新的替换老的
+    // 老的是数组，新的是文本 => 新的覆盖老的
+    if (nextShapeFlag & shapeFlags.TEXT_CHILDREN) {
+      if (c1 !== c2) {
+        hostSetElementText(el, c2);
+      }
+    } else {
+      // 老的是数组，新的是数组 => diff算法
+      if (prevShapeFlag & shapeFlags.ARRAY_CHILDREN) {
+      } else {
+        // 老的是文本，新的是数组 => 删除老的，插入新的节点
+        if (prevShapeFlag & shapeFlags.TEXT_CHILDREN) {
+          // 删除老的文本
+          hostSetElementText(el, "");
+        }
+        if (nextShapeFlag & shapeFlags.ARRAY_CHILDREN) {
+          for (let i = 0; i < c2.length; i++) {
+            const element = c2[i];
+            patch(null, element, el);
+          }
+        }
+      }
+    }
+  }
+  const patchElement = (n1: any, n2: any, container: any) => {
+    // 走到这里说明n1不为null，并且n1,n2的标签相同,那么老节点复用，比对他的props和儿子
+    let el = (n2.el = n1.el);
+    const oldProps = n1.props || {};
+    const newProps = n2.props || {};
+    // 比对属性
+    patchProps(oldProps, newProps, el);
+    // 比对children
+    patchChildren(n1, n2, el);
+  };
   const mountComponent = (initialVnode: any, container: any) => {
     // 组件挂载逻辑
     // 创建组件实例，记录当前组件的状态
@@ -100,8 +170,10 @@ function baseCreateRenderer(options: any) {
   // 处理元素
   const processElement = (n1: any, n2: any, container: any) => {
     if (n1 === null) {
-      mountElement(n1, container);
+      // 挂载元素
+      mountElement(n2, container);
     } else {
+      // 更新元素
       patchElement(n1, n2, container);
     }
   };
@@ -109,16 +181,34 @@ function baseCreateRenderer(options: any) {
   // 处理组件
   const processComponent = (n1: any, n2: any, container: any) => {
     if (n1 === null) {
-      //挂载
-      mountComponent(n1, container);
+      //挂载组件
+      mountComponent(n2, container);
     } else {
-      //更新
+      //更新组件
       updateComponent(n1, n2, container);
     }
   };
 
+  /**
+   * 判断是不是相同标签元素
+   * @param n1
+   * @param n2
+   * @returns
+   */
+  function isSameVnoedType(n1: any, n2: any) {
+    // 判断标签名，和key(没传就是undefined)是否相同
+    return n1.type === n2.type && n1.key === n2.key;
+  }
+
   // n1老节点 n2新节点
   const patch = (n1: any, n2: any, container: any) => {
+    // 如果有n1，说明是更新节点
+    if (n1 && !isSameVnoedType(n1, n2)) {
+      // 有老节点，并且老节点和新节点的标签不一样，删除老节点
+      hostRemove(n1.el);
+      n1 = null; // n1是null的话，process会挂载元素
+    }
+
     // 将虚拟节点转化为真实节点，挂载到容器上
     let { shapeFlag } = n2;
     // 推断类型最佳实践 &与 两边都是1 才返回1
