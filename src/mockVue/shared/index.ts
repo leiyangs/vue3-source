@@ -4,4 +4,5 @@ export const isSymbol = (val: any) => typeof val === "symbol";
 export const isInteger = (val: any) => "" + parseInt(val, 10) === val;
 export const hasChanged = (val: any, oldVal: any) => val == oldVal;
 export const isString = (val: any) => typeof val === "string";
+export const isFunction = (val: any) => typeof val === "function";
 export * from "./shapeFlags";
