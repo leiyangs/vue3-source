@@ -16,7 +16,7 @@ export function createRenderer(options: any) {
 
 function baseCreateRenderer(options: any) {
   const render = (vNode: any, container: any) => {
-    patch(null, vNode, container);
+    patch(null, vNode, container); // 递归对比
   };
 
   /**
@@ -109,6 +109,44 @@ function baseCreateRenderer(options: any) {
       }
     }
   }
+
+  /**
+   * 比较新/老子节点
+   * @param c1
+   * @param c2
+   * @param el
+   */
+  function patchKeyChildren(c1: any, c2: any, el: any) {
+    let i = 0;
+    let e1 = c1.length; // 旧的子最后一项索引
+    let e2 = c2.length; // 新的子最后一项索引
+    // 正序循环对比(前面不动，后面需东 abc => abcd)
+    while (i <= e1 && i <= e2) {
+      // 所有的项都遍历完
+      const n1 = c1[i];
+      const n2 = c2[i];
+      // 判断是不是相同标签
+      if (isSameVnoedType(n1, n2)) {
+        patch(n1, n2, el);
+      } else {
+        break;
+      }
+      i++;
+    }
+    // 倒序循环对比(后面不动，前面需动 adc => dabc)
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[e1];
+      const n2 = c2[e2];
+      if (isSameVnoedType(n1, n2)) {
+        patch(n1, n2, el);
+      } else {
+        break;
+      }
+      e1--;
+      e2--;
+    }
+  }
+
   /**
    * 比较子(一个：字符串，多个：数组) 核心diff算法
    * @param n1
@@ -116,8 +154,8 @@ function baseCreateRenderer(options: any) {
    * @param el
    */
   function patchChildren(n1: any, n2: any, el: any) {
-    const c1 = n1.children;
-    const c2 = n2.children;
+    const c1 = n1.children; // 所有老节点
+    const c2 = n2.children; // 所有新节点
     const prevShapeFlag = n1.shapeFlag;
     const nextShapeFlag = n2.shapeFlag;
     // 老的是文本，新的是文本 => 新的替换老的
@@ -129,6 +167,7 @@ function baseCreateRenderer(options: any) {
     } else {
       // 老的是数组，新的是数组 => diff算法
       if (prevShapeFlag & shapeFlags.ARRAY_CHILDREN) {
+        patchKeyChildren(c1, c2, el);
       } else {
         // 老的是文本，新的是数组 => 删除老的，插入新的节点
         if (prevShapeFlag & shapeFlags.TEXT_CHILDREN) {
