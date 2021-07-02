@@ -61,7 +61,7 @@ function baseCreateRenderer(options: any) {
     insert: hostInsert,
     remove: hostRemove,
   } = options;
-  const mountElement = (vnode: any, container: any) => {
+  const mountElement = (vnode: any, container: any, anchor: any) => {
     let { shapeFlag, props } = vnode;
     let el = (vnode.el = hostCreateElement(vnode.type));
     // 创建子节点
@@ -81,7 +81,7 @@ function baseCreateRenderer(options: any) {
         }
       }
     }
-    hostInsert(el, container);
+    hostInsert(el, container, anchor);
   };
 
   /**
@@ -120,6 +120,7 @@ function baseCreateRenderer(options: any) {
     let i = 0;
     let e1 = c1.length; // 旧的子最后一项索引
     let e2 = c2.length; // 新的子最后一项索引
+    // 后面添加
     // 正序循环对比(前面不动，后面需东 abc => abcd)
     while (i <= e1 && i <= e2) {
       // 所有的项都遍历完
@@ -133,6 +134,7 @@ function baseCreateRenderer(options: any) {
       }
       i++;
     }
+    // 前面添加
     // 倒序循环对比(后面不动，前面需动 adc => dabc)
     while (i <= e1 && i <= e2) {
       const n1 = c1[e1];
@@ -144,6 +146,54 @@ function baseCreateRenderer(options: any) {
       }
       e1--;
       e2--;
+    }
+    // 元素新增删除
+    // i>e1就说明一定有新增项
+    if (i > e1) {
+      // i<e2表示有新增部分，e2大于i的部分就是新增部分
+      // abc => dabc i=3 e1=2 e2=3   abc => abcd i=0 e1=-1 e2=0
+      if (i <= e2) {
+        // 根据e2取下一个元素，和数组长度进行比较
+        const nextPositon = e2 + 1;
+        const anchor = nextPositon < c2.length ? c2[nextPositon].el : null; // 如果有下个元素，就插到下个元素前面.如果没有就查到父元素的末尾
+        while (i < e2) {
+          patch(null, c2[i], el, anchor);
+          i++;
+        }
+      }
+    } else if (i > e2) {
+      // 如果i>e2，那就是删除元素
+      // abcd => abc i=3 e1=3 e2=2
+      while (i <= e1) {
+        hostRemove(c1[i].el);
+        i++;
+      }
+    } else {
+      // 无规则的情况
+      // ab cde fg   start1=2 e1=4
+      // ab edch fg  start2=2 e2=5
+      const start1 = i;
+      const start2 = i;
+      // 把心索引和key做映射表
+      const keyToNewIndexMap = new Map();
+      for (let i = start2; i < e2; i++) {
+        const nextChild = c2[i];
+        keyToNewIndexMap.set(nextChild.key, i);
+      }
+      // 元素改变的位置
+      const toBePatched = e2 - start2 + 1;
+      const newIndexToOldMapIndex = new Array(toBePatched).fill(0);
+      for (let i = 0; i < e1; i++) {
+        const prevChild = c1[i];
+        let newIndex = keyToNewIndexMap.get(prevChild.key); // 新的中是否有老的
+        if (newIndex == undefined) {
+          // 老的有，新的没有
+          hostRemove(prevChild, el);
+        } else {
+          newIndexToOldMapIndex[newIndex - start2] = i + 1;
+          patch(prevChild, c2[newIndex], el);
+        }
+      }
     }
   }
 
@@ -183,7 +233,7 @@ function baseCreateRenderer(options: any) {
       }
     }
   }
-  const patchElement = (n1: any, n2: any, container: any) => {
+  const patchElement = (n1: any, n2: any, container: any, anchor: any) => {
     // 走到这里说明n1不为null，并且n1,n2的标签相同,那么老节点复用，比对他的props和儿子
     let el = (n2.el = n1.el);
     const oldProps = n1.props || {};
@@ -207,13 +257,13 @@ function baseCreateRenderer(options: any) {
   const updateComponent = (n1: any, n2: any, container: any) => {};
 
   // 处理元素
-  const processElement = (n1: any, n2: any, container: any) => {
+  const processElement = (n1: any, n2: any, container: any, anchor: any) => {
     if (n1 === null) {
       // 挂载元素
-      mountElement(n2, container);
+      mountElement(n2, container, anchor);
     } else {
       // 更新元素
-      patchElement(n1, n2, container);
+      patchElement(n1, n2, container, anchor);
     }
   };
 
@@ -239,8 +289,14 @@ function baseCreateRenderer(options: any) {
     return n1.type === n2.type && n1.key === n2.key;
   }
 
-  // n1老节点 n2新节点
-  const patch = (n1: any, n2: any, container: any) => {
+  /**
+   * 创建元素
+   * @param n1 老节点
+   * @param n2 新节点
+   * @param container 容器
+   * @param anchor 参照物
+   */
+  const patch = (n1: any, n2: any, container: any, anchor?: any) => {
     // 如果有n1，说明是更新节点
     if (n1 && !isSameVnoedType(n1, n2)) {
       // 有老节点，并且老节点和新节点的标签不一样，删除老节点
@@ -254,7 +310,7 @@ function baseCreateRenderer(options: any) {
     // 二进制类型每位一次判断 00010000 10001000
     if (shapeFlag & shapeFlags.ELEMENT) {
       // 元素
-      processElement(n1, n2, container);
+      processElement(n1, n2, container, anchor);
     } else if (shapeFlag & shapeFlags.STATEFUL_COMPONENT) {
       // 组件
       processComponent(n1, n2, container);
