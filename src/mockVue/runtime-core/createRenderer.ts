@@ -4,6 +4,7 @@ import { effect } from "../reactivity";
 import { shapeFlags } from "../shared";
 import { createAppAPI } from "./apiCreateApp";
 import { createComponentInstance, setupComponent } from "./component";
+import getSequence from "@/utils/getSequence";
 
 /**
  * 创建渲染器
@@ -192,6 +193,29 @@ function baseCreateRenderer(options: any) {
         } else {
           newIndexToOldMapIndex[newIndex - start2] = i + 1;
           patch(prevChild, c2[newIndex], el);
+        }
+      }
+      // 最长递增子序列
+      const increasingIndexSequence = getSequence(newIndexToOldMapIndex);
+      let j = increasingIndexSequence.length - 1;
+      for (let i = 0; i < toBePatched; i++) {
+        const nextIndex = start2 + i; // 找到变化的最后一项索引
+        // 找到这一项
+        const nextChild = c2[nextIndex];
+        // 找到当前元素的下一元素
+        let anchor = nextIndex + 1 < c2.length ? c2[nextIndex + 1] : null;
+        if (newIndexToOldMapIndex[i] === 0) {
+          // 如果是0则是新元素，直接插入到当前元素的下一个
+          patch(null, nextChild, el, anchor);
+        } else {
+          // 根据参照物，依次将节点移动,没考虑不需要移动的节点
+          // hostInsert(nextChild, el, el, anchor);
+          // 最长递增子序列
+          if (j < 0 || j != increasingIndexSequence[j]) {
+            hostInsert(nextChild, el, el, anchor);
+          } else {
+            j--;
+          }
         }
       }
     }
